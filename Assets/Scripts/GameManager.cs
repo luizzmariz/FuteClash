@@ -48,14 +48,11 @@ public class GameManager : MonoBehaviour
     public GameObject invalidUsername;
     public GameObject invalidEmail;
     Data.Player player;
-    Data.Player oponent;
-    private int team = 1;
-    private int oponentTeam;
     
     [Header("Match")]
     public bool isInMatch;
     public bool isQueueing;
-    public string challenged;
+    Data matchInfo;
     public bool matchVariablesAssigned = false;
     public GameObject onQueueListPanel;
 
@@ -84,6 +81,7 @@ public class GameManager : MonoBehaviour
         invalidEmail.SetActive(false);
         isInMatch = false;
         isQueueing = false;
+        matchInfo.team = 1;
     }
 
     void Update()
@@ -298,7 +296,6 @@ public class GameManager : MonoBehaviour
             }
             if(deserializedProduct[0].queueList)
             {
-                Debug.Log("Teste 4");
                 onQueueListPanel.SendMessage("ListUpdate", deserializedProduct[0]);
             }
             else
@@ -321,8 +318,8 @@ public class GameManager : MonoBehaviour
             isQueueing = false;
             isInMatch = true;
             ScreenChanger("createMatch");
-            this.oponent = deserializedProduct[0].oponent;
-            oponentTeam = deserializedProduct[0].team;
+            matchInfo.oponent = deserializedProduct[0].oponent;
+            matchInfo.oponentTeam = deserializedProduct[0].oponentTeam;
         });
     }
 
@@ -340,12 +337,12 @@ public class GameManager : MonoBehaviour
 
             case "onQueue":
             Debug.Log("Teste 3.1");
-            socket.Emit("onQueue", isQueueing);
+            socket.Emit("onQueue", matchInfo);
             break;
 
             case "challengeSomeone":
             Debug.Log("Teste 3.2");
-            socket.Emit("challengeSomeone", challenged);
+            socket.Emit("challengeSomeone", matchInfo);
             break;
 
             case "getQueueInfo":
@@ -381,7 +378,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            challenged = enemy;
+            matchInfo.oponent.id = enemy;
             Debug.Log("Teste 2.2");
             SocketEmit("challengeSomeone");
         }
@@ -405,7 +402,7 @@ public class GameManager : MonoBehaviour
 
     public void ChangeTeam(int team)
     {
-        this.team = team;
+        matchInfo.team = team;
     }
     
     public void QuitGame()

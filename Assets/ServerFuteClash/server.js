@@ -17,6 +17,7 @@ io.use((socket, next) => {
 
 let players = [];
 let playersOnQueue = [];
+let playersTeam = [];
 let playersInMatch = [];
 
 function playersIn(socketId, username, email)
@@ -62,7 +63,6 @@ function playersIn(socketId, username, email)
         });
       io.to(socketId).emit('signIn', {signedCheck: signed, usernameCheck: usernameVerification, emailCheck: emailVerification});
       io.emit('playersList', {playersList: players, queueList: false});
-      //
       console.log(username + ' entered the game.');
     }
     else{
@@ -113,12 +113,17 @@ function message(socketId, chatId, messageContent)
   }
 }
 
-function Queue(socketId)
+function Queue(socketId, team)
 {
   var playerQueueing = players.find(e => e.id === socketId);
   if(playersOnQueue.length === 0)
   {
     playersOnQueue.push(playerQueueing);
+    playersTeam.push(
+      {
+        player: playerQueueing,
+        team: team
+      });
     io.emit('playersList', {playersList: playersOnQueue, queueList: true});
     console.log(playerQueueing.playerUsername + " entrou da fila pelo metodo 1, agr tem " + playersOnQueue.length + " na fila");
   }
@@ -133,30 +138,36 @@ function Queue(socketId)
           console.log(playersOnQueue[i].playerUsername + " saiu da fila, agr tem " + playersOnQueue.length + " na fila");
         }
         playersOnQueue[i] = playersOnQueue[i+1];
+        playersTeam[i] = playersTeam[i+1]
       }
-      players.pop()
+      playersOnQueue.pop();
+      playersTeam.pop();
       io.emit('playersList', {playersList: playersOnQueue, queueList: true});
     }
     else
     {
       playersOnQueue.push(playerQueueing);
+      playersTeam.push(
+        {
+          player: playerQueueing,
+          team: team
+        });
       io.emit('playersList', {playersList: playersOnQueue, queueList: true});
       console.log(playerQueueing.playerUsername + " entrou da fila pelo metodo 2, agr tem " + playersOnQueue.length + " na fila");
     }
   }
 }
 
-function CreatingMatch(socketId, challenged)
+function CreatingMatch(socketId, team, challenged)
 {
-  if((playersInMatch.findIndex(e => e.id === data) === -1))
+  if((playersInMatch.findIndex(e => e.id === challenged) === -1))
   {
+    var playerChallenged = playersTeam.find(e => e.player === players.find(e => e.id === challenged));
+    playersInMatch.push(players.find(e => e.id === challenged));
     Queue(challenged);
-    var playerEnteringTheMatch = players.find(e => e.id === socketId);
-    playersInMatch.push(playerEnteringTheMatch);
-    io.to(challenged).emit('startMatch', {oponent: playerEnteringTheMatch});
-    playerEnteringTheMatch = players.find(e => e.id === challenged);
-    playersInMatch.push(playerEnteringTheMatch);
-    io.to(socketId).emit('startMatch', {oponent: playerEnteringTheMatch});
+    playersInMatch.push(players.find(e => e.id === socketId));
+    io.to(challenged).emit('startMatch', {oponent: players.find(e => e.id === socketId), oponentTeam: team});
+    io.to(socketId).emit('startMatch', {oponent: players.find(e => e.id === challenged), oponentTeam: playerChallenged.team});
     console.log(playersInMatch);
   }
 }
@@ -188,17 +199,14 @@ io.on('connection', (socket) =>
 
   socket.on('onQueue', (data) => 
   {
-    if((playersOnQueue.findIndex(e => e.id === socket.id) === -1))
-    {
-      Queue(socket.id);
-    }
+      Queue(socket.id, data.team);
   })
 
   socket.on('challengeSomeone', (data) => 
   {
-    if((playersInMatch.findIndex(e => e.id === data) === -1))
+    if((playersInMatch.findIndex(e => e.id === data.oponent.id) === -1))
     {
-      CreatingMatch(socket.id, data);
+      CreatingMatch(socket.id, data.team, data.oponent.id);
     }
   })
 
