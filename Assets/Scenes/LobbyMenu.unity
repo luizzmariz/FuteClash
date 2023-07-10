@@ -1588,7 +1588,7 @@ MonoBehaviour:
   playMatchScreen: {fileID: 666587914}
   chatScreen: {fileID: 739696478}
   messagePanel: {fileID: 1223633567}
-  optionsScreenInGame: {fileID: 0}
+  matchOptions: {fileID: 0}
   gameLogo: {fileID: 2141743130}
   isConnected: 0
   isTryingToConnect: 0
@@ -1604,6 +1604,7 @@ MonoBehaviour:
   challenged: 
   matchVariablesAssigned: 0
   onQueueListPanel: {fileID: 1743761162}
+  matchButton: {fileID: 1874596527}
 --- !u!4 &248638012
 Transform:
   m_ObjectHideFlags: 0

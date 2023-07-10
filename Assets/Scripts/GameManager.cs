@@ -58,8 +58,6 @@ public class GameManager : MonoBehaviour
     public string challenged;
     public bool matchVariablesAssigned = false;
     public GameObject onQueueListPanel;
-    public Button matchButton;
-    
 
     public void Start()
     {
@@ -192,7 +190,6 @@ public class GameManager : MonoBehaviour
             case "endMatch":
             optionsScreen.SetActive(false);
             SceneManager.LoadScene("LobbyMenu");
-            matchButton.interactable = true;
             break;
 
             case "disconnect":
@@ -378,14 +375,12 @@ public class GameManager : MonoBehaviour
     {
         if(enemy == "none")
         {
-            matchButton.interactable = false;
-            isQueueing = true;
+            isQueueing = !isQueueing;
             Debug.Log("Teste 2.1");
             SocketEmit("onQueue");
         }
         else
         {
-            matchButton.interactable = false;
             challenged = enemy;
             Debug.Log("Teste 2.2");
             SocketEmit("challengeSomeone");

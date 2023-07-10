@@ -33,4 +33,5 @@ public class Data
 
     public Player oponent;
     public int team;
+    public int oponentTeam;
 }
