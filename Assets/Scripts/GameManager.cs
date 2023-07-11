@@ -81,6 +81,7 @@ public class GameManager : MonoBehaviour
         invalidEmail.SetActive(false);
         isInMatch = false;
         isQueueing = false;
+        matchInfo = new Data();
         matchInfo.team = 1;
     }
 
@@ -296,6 +297,7 @@ public class GameManager : MonoBehaviour
             }
             if(deserializedProduct[0].queueList)
             {
+                Debug.Log("323");
                 onQueueListPanel.SendMessage("ListUpdate", deserializedProduct[0]);
             }
             else
@@ -337,7 +339,7 @@ public class GameManager : MonoBehaviour
 
             case "onQueue":
             Debug.Log("Teste 3.1");
-            socket.Emit("onQueue", matchInfo);
+            socket.Emit("onQueue", matchInfo.team);
             break;
 
             case "challengeSomeone":

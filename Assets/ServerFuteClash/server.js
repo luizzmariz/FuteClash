@@ -199,7 +199,7 @@ io.on('connection', (socket) =>
 
   socket.on('onQueue', (data) => 
   {
-      Queue(socket.id, data.team);
+      Queue(socket.id, data);
   })
 
   socket.on('challengeSomeone', (data) => 
