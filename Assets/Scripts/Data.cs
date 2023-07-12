@@ -34,4 +34,14 @@ public class Data
     public Player oponent;
     public int team;
     public int oponentTeam;
+
+    //inMatchVariables
+    public float ballX;
+    public float ballY;
+    public float goalKeeperX;
+    public float leftPlayerZ;
+    public float rightPlayerZ;
+    public string pontuatiuon;
+    public string matchId;
+    public string winner;
 }

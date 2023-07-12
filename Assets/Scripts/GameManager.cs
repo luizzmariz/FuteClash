@@ -53,8 +53,10 @@ public class GameManager : MonoBehaviour
     public bool isInMatch;
     public bool isQueueing;
     Data matchInfo;
+    Data matchInfo2;
     public bool matchVariablesAssigned = false;
     public GameObject onQueueListPanel;
+    public GameObject matchController;
 
     public void Start()
     {
@@ -82,6 +84,7 @@ public class GameManager : MonoBehaviour
         isInMatch = false;
         isQueueing = false;
         matchInfo = new Data();
+        matchInfo2 = new Data();
         matchInfo.team = 1;
     }
 
@@ -183,7 +186,6 @@ public class GameManager : MonoBehaviour
             case "createMatch":
             optionsScreen.SetActive(false);
             SceneManager.LoadScene("Match");
-            //optionsScreenInGame = 
             break;
 
             case "endMatch":
@@ -322,6 +324,21 @@ public class GameManager : MonoBehaviour
             ScreenChanger("createMatch");
             matchInfo.oponent = deserializedProduct[0].oponent;
             matchInfo.oponentTeam = deserializedProduct[0].oponentTeam;
+            matchInfo2.matchId = deserializedProduct[0].matchId;
+        });
+
+        socket.OnUnityThread("matchPositions", (data) =>
+        {
+            //Debug.Log(data);
+            List<Data> deserializedProduct = JsonConvert.DeserializeObject<List<Data>>(data.ToString());
+
+            if(isInMatch)
+            {
+                matchController.SendMessage("ReceiveInfo", deserializedProduct[0]);
+            }
+            matchInfo.oponent = deserializedProduct[0].oponent;
+            matchInfo.oponentTeam = deserializedProduct[0].oponentTeam;
+            matchInfo2.matchId = deserializedProduct[0].matchId;
         });
     }
 
@@ -338,17 +355,19 @@ public class GameManager : MonoBehaviour
             break;
 
             case "onQueue":
-            Debug.Log("Teste 3.1");
             socket.Emit("onQueue", matchInfo.team);
             break;
 
             case "challengeSomeone":
-            Debug.Log("Teste 3.2");
             socket.Emit("challengeSomeone", matchInfo);
             break;
 
             case "getQueueInfo":
             socket.Emit("getQueueInfo");
+            break;
+
+            case "match":
+            socket.Emit("match", matchInfo2);
             break;
 
             default:
@@ -386,9 +405,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetMatchOptions(GameObject opt)
+    public string SetMatchOptions(GameObject opt)
     {
+        matchController = GameObject.Find("MatchController");
         matchOptions = opt;
+
+        return ("" + matchInfo.team + matchInfo.oponentTeam); 
     }
 
     public void EndMatch()
@@ -405,6 +427,12 @@ public class GameManager : MonoBehaviour
     public void ChangeTeam(int team)
     {
         matchInfo.team = team;
+    }
+
+    public void MatchInformation(Data info)
+    {
+        matchInfo2 = info;
+        SocketEmit("match");
     }
     
     public void QuitGame()

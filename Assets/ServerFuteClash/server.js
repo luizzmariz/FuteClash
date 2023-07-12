@@ -19,6 +19,33 @@ let players = [];
 let playersOnQueue = [];
 let playersTeam = [];
 let playersInMatch = [];
+let match = [];
+
+const playerDimension = 0.30;
+const ballRadius = 0.15;
+const gameHeight = 5.00;
+const gameLength = 10.00;
+
+/*
+let posX = gameLength / 2;
+let posY = gameHeight / 2;
+let speedX = 0;
+let speedY = 0;
+let AGoalKeeperX = 0; //leftPaddleY
+let BGoalKeeperX = 0; //rightPaddleY
+let ALeftPlayerX = 0;
+let BLeftPlayerX = 0;
+let ALeftPlayerZ = 0;
+let BLeftPlayerZ = 0;
+let ARightPlayerX = 0;
+let BRightPlayerX = 0;
+let ARightPlayerZ = 0;
+let BRightPlayerZ = 0;
+let leftGoalKeeperX = 0;
+let gameIsGoing = false;
+let rightScore = 0;
+let leftScore = 0;
+*/
 
 function playersIn(socketId, username, email)
 {
@@ -166,8 +193,28 @@ function CreatingMatch(socketId, team, challenged)
     playersInMatch.push(players.find(e => e.id === challenged));
     Queue(challenged);
     playersInMatch.push(players.find(e => e.id === socketId));
-    io.to(challenged).emit('startMatch', {oponent: players.find(e => e.id === socketId), oponentTeam: team});
-    io.to(socketId).emit('startMatch', {oponent: players.find(e => e.id === challenged), oponentTeam: playerChallenged.team});
+    match.push(
+      {
+        id: socketId+challenged,
+        leftPlayer: socketId,
+        rightPlayer: challenged,
+        posX: 0,
+        posY: 0,
+        speedX: 0,
+        speedY: 0,
+        AGoalKeeperX: 0,
+        BGoalKeeperX: 0,
+        ALeftPlayerZ: 0,
+        BLeftPlayerZ: 0,
+        ARightPlayerZ: 0,
+        BRightPlayerZ: 0,
+        leftGoalKeeperX: 0,
+        gameIsGoing: false,
+        rightScore: 0,
+        leftScore: 0
+      });
+    io.to(challenged).emit('startMatch', {oponent: players.find(e => e.id === socketId), oponentTeam: team, matchId: match[match.length - 1].Id});
+    io.to(socketId).emit('startMatch', {oponent: players.find(e => e.id === challenged), oponentTeam: playerChallenged.team, matchId: match[match.length - 1].Id});
     console.log(playersInMatch);
   }
 }
@@ -175,6 +222,142 @@ function CreatingMatch(socketId, team, challenged)
 function GetQueueInfo(socketId)
 {
   io.to(socketId).emit('playersList', {playersList: playersOnQueue, queueList: true});
+}
+
+// function score(score, match)
+// {
+//   if(score === 'left')
+//   {
+//     match.leftScore = match.leftScore + 1;
+//     io.to(match.leftPlayer).emit('match', {pontuatiuon: "" + match.leftScore + " : " + match.rightScore})
+//     io.to(match.rightPlayer).emit('match', {pontuatiuon: "" + match.leftScore + " : " + match.rightScore})
+//     if(leftScore === 7)
+//     {
+//       endGame('left', match)
+//     }
+//     else
+//     {
+//       ballControl();
+//     }
+//   }
+//   if(score === 'right')
+//   {
+//     rightScore = rightScore + 1;
+//     io.to(match.leftPlayer).emit('match', {pontuatiuon: "" + match.leftScore + " : " + match.rightScore})
+//     io.to(match.rightPlayer).emit('match', {pontuatiuon: "" + match.leftScore + " : " + match.rightScore})
+//     if(rightScore === 7)
+//     {
+//       endGame('right', match);
+//     }
+//     else
+//     {
+//       ballControl();
+//     }
+//   }
+// };
+
+// function ballControl()
+// {
+//   if(gameIsGoing == true)
+//   {
+//     posX = gameLength / 2;
+//     posY = gameHeight / 2;
+//     speedX = -3;
+//     speedY = 3;
+//   }
+//   if(gameIsGoing == false)
+//   {
+//     gameIsGoing = true;
+//     speedX = 3;
+//     speedY = -3;
+//     updateBall();
+//   }
+// };
+
+// function updateBall(match) 
+// {
+//   if(gameIsGoing)
+//   {
+//     match.posX += match.speedX;
+//     match.posY += match.speedY;
+//     checkColision(match);
+//     setTimeout(() => 
+//     {
+//       updateBall(match);
+//     }, 100);
+//   }
+// };
+
+// function checkColision(match)
+// {
+//   if(match.posY < -2.5 + ballRadius)
+//   {
+//     match.speedY *= -1;
+//   }
+//   if(match.posY > 2.5 - ballRadius)
+//   {
+//     match.speedY *= -1;
+//   }
+//   if(match.posX >= 5 - ballRadius)
+//   {
+//     score('right', match);
+//   }
+//   if(match.posX <= (-5 + ballRadius))
+//   {
+//     score('left', match);
+//   }
+//   if((match.posX < (match.AGoalKeeperZ + (playerDimension/2))) && (match.posX >= (match.AGoalKeeperZ - (playerDimension/2) - ballRadius)))
+//   {
+//     if(match.posY > (match.AGoalKeeperX - (playerDimension/2) -ballRadius) && match.posY < (match.AGoalKeeperX + (playerDimension/2)))
+//     {
+//       match.speedX *= -1;
+//       match.posX = match.AGoalKeeperZ - (playerDimension/2) - ballRadius;
+//     }
+//   }
+//   if(match.posX > (match.BGoalKeeperZ - (playerDimension/2)) && match.posX <= (match.BGoalKeeperZ + (playerDimension/2) + ballRadius))
+//   {
+//     if(match.posY > (match.BGoalKeeperX - (playerDimension/2) -ballRadius) && match.posY < (match.BGoalKeeperX + (playerDimension/2)))
+//     {
+//       match.speedX *= -1;
+//       match.posX = gameLength - paddleWidth - ballRadius;
+//     }
+//   }
+// };
+
+// function endGame(winner, match)
+// {
+//   if(winner === 'left')
+//   {
+
+//   }
+//   match.gameIsGoing = false;
+//   match.rightScore, leftScore = 0;
+//   posX = gameLength / 2;
+//   posY = gameHeight / 2;
+//   speedX = 0;
+//   speedY = 0;
+//   io.to(match.leftPlayer).emit('endGame', {winner: ""})
+// }
+
+function UpdateMatch(socketId, data)
+{
+  let matchI = match.findIndex(e => e.id === data.matchId);
+  if(socketId === match.leftPlayer)
+  {
+    match[matchI].AGoalKeeperX = data.goalKeeperX * -1;
+    match[matchI].ALeftPlayerZ = data.leftPlayerZ * -1;
+    match[matchI].ARightPlayerZ = data.rightPlayerZ * -1;
+
+    io.to(match.rightPlayer).emit('matchPositions', {goalKeeperX: match[matchI].AGoalKeeperX, leftPlayerZ: match[matchI].ALeftPlayerZ, rightPlayerZ: match[matchI].ARightPlayerZ});
+  }
+  else
+  {
+    match[matchI].BGoalKeeperX = data.goalKeeperX;
+    match[matchI].BLeftPlayerZ = data.leftPlayerZ;
+    match[matchI].BRightPlayerZ = data.rightPlayerZ;
+
+    io.to(match.leftPlayer).emit('matchPositions', {goalKeeperX: match[matchI].BGoalKeeperX, leftPlayerZ: match[matchI].BLeftPlayerZ, rightPlayerZ: match[matchI].BRightPlayerZ});
+  }
 }
 
 io.on('connection', (socket) => 
@@ -213,6 +396,11 @@ io.on('connection', (socket) =>
   socket.on('getQueueInfo', (data) => 
   {
     GetQueueInfo(socket.id);
+  })
+
+  socket.on('match', (data) => 
+  {
+    UpdateMatch(socket.id, data);
   })
 });
 
