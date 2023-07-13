@@ -4,6 +4,9 @@ Jogo feito para a matéria de Jogos em rede multiusuário.
 # Desenvolvedores
 - Luiz Mariz
 - Jonas Sena
+
+# Video
+https://www.youtube.com/watch?v=_HR4xeLa1oE
   
 # Server
 
