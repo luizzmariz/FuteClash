@@ -332,7 +332,7 @@ function UpdateMatch(socketId, data)
     match[matchI].BGoalKeeperX = data.goalKeeperX;
     match[matchI].BLeftPlayerZ = data.leftPlayerZ;
     match[matchI].BRightPlayerZ = data.rightPlayerZ;
-    io.to(match[matchI].leftPlayer).emit('matchPositions', {goalKeeperX: match[matchI].BGoalKeeperX, leftPlayerZ: match[matchI].BLeftPlayerZ, rightPlayerZ: match[matchI].BRightPlayerZ});
+    io.to(match[matchI].leftPlayer).emit('matchPositions', {goalKeeperX: match[matchI].BGoalKeeperX, leftPlayerZ: match[matchI].BLeftPlayerZ*-1, rightPlayerZ: match[matchI].BRightPlayerZ*-1});
   }
 }
 
