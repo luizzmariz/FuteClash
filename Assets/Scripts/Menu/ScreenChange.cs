@@ -12,6 +12,7 @@ public class ScreenChange : MonoBehaviour
 
     void Start()
     {
+        gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         thisButton = GetComponent<Button>();
     }
 

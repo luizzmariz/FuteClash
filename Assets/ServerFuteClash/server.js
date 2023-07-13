@@ -26,27 +26,6 @@ const ballRadius = 0.15;
 const gameHeight = 5.00;
 const gameLength = 10.00;
 
-/*
-let posX = gameLength / 2;
-let posY = gameHeight / 2;
-let speedX = 0;
-let speedY = 0;
-let AGoalKeeperX = 0; //leftPaddleY
-let BGoalKeeperX = 0; //rightPaddleY
-let ALeftPlayerX = 0;
-let BLeftPlayerX = 0;
-let ALeftPlayerZ = 0;
-let BLeftPlayerZ = 0;
-let ARightPlayerX = 0;
-let BRightPlayerX = 0;
-let ARightPlayerZ = 0;
-let BRightPlayerZ = 0;
-let leftGoalKeeperX = 0;
-let gameIsGoing = false;
-let rightScore = 0;
-let leftScore = 0;
-*/
-
 function playersIn(socketId, username, email)
 {
   var usernameVerification = true;
@@ -193,29 +172,28 @@ function CreatingMatch(socketId, team, challenged)
     playersInMatch.push(players.find(e => e.id === challenged));
     Queue(challenged);
     playersInMatch.push(players.find(e => e.id === socketId));
-    match.push(
-      {
-        id: socketId+challenged,
-        leftPlayer: socketId,
-        rightPlayer: challenged,
-        posX: 0,
-        posY: 0,
-        speedX: 0,
-        speedY: 0,
-        AGoalKeeperX: 0,
-        BGoalKeeperX: 0,
-        ALeftPlayerZ: 0,
-        BLeftPlayerZ: 0,
-        ARightPlayerZ: 0,
-        BRightPlayerZ: 0,
-        leftGoalKeeperX: 0,
-        gameIsGoing: false,
-        rightScore: 0,
-        leftScore: 0
-      });
-    io.to(challenged).emit('startMatch', {oponent: players.find(e => e.id === socketId), oponentTeam: team, matchId: match[match.length - 1].Id});
-    io.to(socketId).emit('startMatch', {oponent: players.find(e => e.id === challenged), oponentTeam: playerChallenged.team, matchId: match[match.length - 1].Id});
-    console.log(playersInMatch);
+    var currentMatch = 
+    {
+      id: socketId+challenged,
+      leftPlayer: socketId,
+      rightPlayer: challenged,
+      posX: 0,
+      posY: 0,
+      speedX: 0,
+      speedY: 0,
+      AGoalKeeperX: 0,
+      BGoalKeeperX: 0,
+      ALeftPlayerZ: 0,
+      BLeftPlayerZ: 0,
+      ARightPlayerZ: 0,
+      BRightPlayerZ: 0,
+      gameIsGoing: false,
+      rightScore: 0,
+      leftScore: 0
+    }
+    match.push(currentMatch);
+    io.to(challenged).emit('startMatch', {oponent: players.find(e => e.id === socketId), oponentTeam: team, matchId: currentMatch.id});
+    io.to(socketId).emit('startMatch', {oponent: players.find(e => e.id === challenged), oponentTeam: playerChallenged.team, matchId: currentMatch.id});
   }
 }
 
@@ -342,21 +320,19 @@ function GetQueueInfo(socketId)
 function UpdateMatch(socketId, data)
 {
   let matchI = match.findIndex(e => e.id === data.matchId);
-  if(socketId === match.leftPlayer)
+  if(socketId === match[matchI].leftPlayer)
   {
     match[matchI].AGoalKeeperX = data.goalKeeperX * -1;
     match[matchI].ALeftPlayerZ = data.leftPlayerZ * -1;
     match[matchI].ARightPlayerZ = data.rightPlayerZ * -1;
-
-    io.to(match.rightPlayer).emit('matchPositions', {goalKeeperX: match[matchI].AGoalKeeperX, leftPlayerZ: match[matchI].ALeftPlayerZ, rightPlayerZ: match[matchI].ARightPlayerZ});
+    io.to(match[matchI].rightPlayer).emit('matchPositions', {goalKeeperX: match[matchI].AGoalKeeperX, leftPlayerZ: match[matchI].ALeftPlayerZ, rightPlayerZ: match[matchI].ARightPlayerZ});
   }
-  else
+  else if(socketId === match[matchI].rightPlayer)
   {
     match[matchI].BGoalKeeperX = data.goalKeeperX;
     match[matchI].BLeftPlayerZ = data.leftPlayerZ;
     match[matchI].BRightPlayerZ = data.rightPlayerZ;
-
-    io.to(match.leftPlayer).emit('matchPositions', {goalKeeperX: match[matchI].BGoalKeeperX, leftPlayerZ: match[matchI].BLeftPlayerZ, rightPlayerZ: match[matchI].BRightPlayerZ});
+    io.to(match[matchI].leftPlayer).emit('matchPositions', {goalKeeperX: match[matchI].BGoalKeeperX, leftPlayerZ: match[matchI].BLeftPlayerZ, rightPlayerZ: match[matchI].BRightPlayerZ});
   }
 }
 

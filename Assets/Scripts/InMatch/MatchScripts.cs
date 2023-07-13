@@ -65,7 +65,6 @@ public class MatchScripts : MonoBehaviour
         Invoke("StartText", 1.0f);
     }
 
-    // Update is called once per frame
     void Update()
     {
         SendInfo();
@@ -325,9 +324,10 @@ public class MatchScripts : MonoBehaviour
         //ballPosX = gg.ballX;
         //ballPosY = gg.ballY;
 
-        goalKeeperB.GetComponent<Transform>().position = new Vector3(gg.goalKeeperX, 0f, 4.7f);
-        leftPlayerB.GetComponent<Transform>().position = new Vector3(1.5f, 0f, gg.leftPlayerZ);
-        rightPlayerB.GetComponent<Transform>().position = new Vector3(-1.5f, 0f, gg.rightPlayerZ);
+        Debug.Log(gg.goalKeeperX);
+        goalKeeperB.GetComponent<Transform>().position = new Vector3(gg.goalKeeperX, 0.3f, 4.7f);
+        leftPlayerB.GetComponent<Transform>().position = new Vector3(1.5f, 0.3f, gg.leftPlayerZ);
+        rightPlayerB.GetComponent<Transform>().position = new Vector3(-1.5f, 0.3f, gg.rightPlayerZ);
 
         //score.text = gg.pontuatiuon;
     }

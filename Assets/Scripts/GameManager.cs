@@ -53,7 +53,6 @@ public class GameManager : MonoBehaviour
     public bool isInMatch;
     public bool isQueueing;
     Data matchInfo;
-    Data matchInfo2;
     public bool matchVariablesAssigned = false;
     public GameObject onQueueListPanel;
     public GameObject matchController;
@@ -84,7 +83,6 @@ public class GameManager : MonoBehaviour
         isInMatch = false;
         isQueueing = false;
         matchInfo = new Data();
-        matchInfo2 = new Data();
         matchInfo.team = 1;
     }
 
@@ -189,7 +187,7 @@ public class GameManager : MonoBehaviour
             break;
 
             case "endMatch":
-            optionsScreen.SetActive(false);
+            matchOptions.SetActive(false);
             SceneManager.LoadScene("LobbyMenu");
             break;
 
@@ -203,7 +201,6 @@ public class GameManager : MonoBehaviour
                 startScreen.SetActive(true);
                 gameLogo.SetActive(true);
             }
-            chatScreen.SetActive(false);
             break;
 
             default:
@@ -324,7 +321,8 @@ public class GameManager : MonoBehaviour
             ScreenChanger("createMatch");
             matchInfo.oponent = deserializedProduct[0].oponent;
             matchInfo.oponentTeam = deserializedProduct[0].oponentTeam;
-            matchInfo2.matchId = deserializedProduct[0].matchId;
+            matchInfo.matchId = deserializedProduct[0].matchId;
+            Debug.Log(matchInfo.matchId);
         });
 
         socket.OnUnityThread("matchPositions", (data) =>
@@ -336,9 +334,6 @@ public class GameManager : MonoBehaviour
             {
                 matchController.SendMessage("ReceiveInfo", deserializedProduct[0]);
             }
-            matchInfo.oponent = deserializedProduct[0].oponent;
-            matchInfo.oponentTeam = deserializedProduct[0].oponentTeam;
-            matchInfo2.matchId = deserializedProduct[0].matchId;
         });
     }
 
@@ -367,7 +362,7 @@ public class GameManager : MonoBehaviour
             break;
 
             case "match":
-            socket.Emit("match", matchInfo2);
+            socket.Emit("match", matchInfo);
             break;
 
             default:
@@ -415,7 +410,6 @@ public class GameManager : MonoBehaviour
 
     public void EndMatch()
     {
-        //SocketEmit("message");
         ScreenChanger("endMatch");
     }
 
@@ -431,13 +425,22 @@ public class GameManager : MonoBehaviour
 
     public void MatchInformation(Data info)
     {
-        matchInfo2 = info;
+        matchInfo.goalKeeperX = info.goalKeeperX;
+        matchInfo.leftPlayerZ = info.leftPlayerZ;
+        matchInfo.rightPlayerZ = info.rightPlayerZ;
         SocketEmit("match");
     }
     
     public void QuitGame()
     {
-        ScreenChanger("disconnect");
+        if(isInMatch)
+        {
+            ScreenChanger("endMatch");
+        }
+        if(isConnected)
+        {
+            ScreenChanger("disconnect");
+        }
 
         #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
